@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guru Ji - Futuristic AI Educational Platform</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/tutor.css">
+  <link rel="stylesheet" href="css/practice.css">
+  <link rel="stylesheet" href="css/notes.css">
+  <link rel="stylesheet" href="css/papers.css">
+  <link rel="stylesheet" href="css/planner.css">
+  
+  <!-- Inline animations override if needed for extra visuals -->
+  <style>
+    /* Additional micro-animations */
+    .header-xp-bar {
+      width: 140px;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+      overflow: hidden;
+      display: inline-block;
+    }
+    .header-xp-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      width: 0%;
+      transition: width var(--transition-normal);
+    }
+    .streak-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .streak-day-node {
+      text-align: center;
+      padding: 10px 4px;
+      border-radius: var(--border-radius-sm);
+      background: rgba(255, 255, 255, 0.01);
+      border: 1px solid var(--border-glass);
+    }
+    .streak-day-node.active {
+      border-color: var(--gold);
+      background: rgba(255, 159, 0, 0.05);
+    }
+    .streak-day-node.today {
+      box-shadow: 0 0 10px rgba(255, 159, 0, 0.2);
+    }
+    .streak-flame-circle {
+      font-size: 16px;
+      margin: 4px 0;
+    }
+    .streak-day-num {
+      font-size: 11px;
+      font-family: var(--font-display);
+      color: var(--text-muted);
+    }
+    .streak-day-lbl {
+      font-size: 10px;
+      color: var(--text-dark);
+      text-transform: uppercase;
+    }
+    .subject-progress-card {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .progress-percent-lbl {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .subject-progress-wheel-box {
+      position: relative;
+      width: 68px;
+      height: 68px;
+    }
+    .progress-wheel {
+      transform: rotate(-90deg);
+    }
+    .wheel-track {
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.03);
+      stroke-width: 4px;
+    }
+    .wheel-fill {
+      fill: none;
+      stroke-width: 4px;
+      stroke-linecap: round;
+      transition: stroke-dashoffset var(--transition-slow);
+    }
+    .wheel-percentage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: var(--font-display);
+    }
+    .activity-feed-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-glass);
+      transition: background var(--transition-fast);
+    }
+    .activity-feed-item:hover {
+      background: rgba(255, 255, 255, 0.01);
+    }
+    .activity-feed-item:last-child {
+      border-bottom: none;
+    }
+    .activity-node-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .activity-feed-details {
+      flex-grow: 1;
+    }
+    .activity-feed-text {
+      font-size: 13px;
+      color: var(--text-main);
+    }
+    .activity-feed-time {
+      font-size: 11px;
+      color: var(--text-dark);
+      margin-top: 2px;
+    }
+    .activity-feed-xp {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: var(--font-display);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar-nav">
+      <div class="logo-container">
+        <div class="logo-icon">G</div>
+        <h1 class="logo-text">Guru Ji</h1>
+      </div>
+      
+      <ul class="nav-menu">
+        <li class="nav-item active"><a href="#" class="nav-link" data-tab="dashboard">
+          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+          Dashboard</a>
+        </li>
+        <li class="nav-item"><a href="#" class="nav-link" data-tab="tutor">
+          <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+          AI Tutor</a>
+        </li>
+        <li class="nav-item"><a href="#" class="nav-link" data-tab="practice">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+          Practice Tests</a>
+        </li>
+        <li class="nav-item"><a href="#" class="nav-link" data-tab="notes">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          Notes Summarizer</a>
+        </li>
+        <li class="nav-item"><a href="#" class="nav-link" data-tab="papers">
+          <svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/></svg>
+          Previous Papers</a>
+        </li>
+        <li class="nav-item"><a href="#" class="nav-link" data-tab="planner">
+          <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+          Study Planner</a>
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <div class="user-profile-summary">
+          <div class="user-avatar" id="sidebar-avatar">IS</div>
+          <div class="user-info">
+            <span class="user-name" id="sidebar-username">Ishaan Sharma</span>
+            <span class="user-level" id="sidebar-user-level">Lvl 12 Scholar</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+    
+    <!-- Main Content Wrapper -->
+    <main class="main-wrapper">
+      
+      <!-- Header -->
+      <header class="top-header">
+        <div style="display:flex; align-items:center; gap:16px;">
+          <button class="mobile-nav-toggle" id="mobile-menu-toggle">
+            <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+          </button>
+          <div class="header-title-area">
+            <h2 id="header-active-page-title">Welcome back, scholar!</h2>
+            <p id="header-active-page-sub">Here is your progress status for today.</p>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <div class="streak-badge">
+            <span>🔥 8 Days</span>
+          </div>
+          <div class="xp-badge">
+            <span style="margin-right:10px;">8450 / 10000 XP</span>
+            <div class="header-xp-bar">
+              <div class="header-xp-fill" id="header-xp-fill"></div>
+            </div>
+            <span id="header-level" style="margin-left:10px; color:var(--accent);">Lvl 12</span>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Body Tab Switchers -->
+      <div class="content-body">
+        
+        <!-- DASHBOARD TAB -->
+        <section class="page-tab active" id="tab-dashboard">
+          
+          <!-- Top Row Cards -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:24px; margin-bottom:30px;">
+            <div class="glass-panel" style="padding:20px; display:flex; align-items:center; gap:16px;">
+              <div style="font-size:32px;">🏆</div>
+              <div>
+                <div style="font-size:12px; color:var(--text-muted); font-family:var(--font-display);">Scholar Rank</div>
+                <h3 style="font-size:20px; color:var(--text-main);" id="dash-level-val">Level 12</h3>
+              </div>
+            </div>
+            <div class="glass-panel" style="padding:20px; display:flex; align-items:center; gap:16px;">
+              <div style="font-size:32px;">🔥</div>
+              <div>
+                <div style="font-size:12px; color:var(--text-muted); font-family:var(--font-display);">Study Streak</div>
+                <h3 style="font-size:20px; color:var(--gold);" id="dash-streak-val">8 Days</h3>
+              </div>
+            </div>
+            <div class="glass-panel" style="padding:20px; display:flex; align-items:center; gap:16px;">
+              <div style="font-size:32px;">⏱️</div>
+              <div>
+                <div style="font-size:12px; color:var(--text-muted); font-family:var(--font-display);">Hours Studied</div>
+                <h3 style="font-size:20px; color:var(--accent);" id="dash-hours-val">14.5h</h3>
+              </div>
+            </div>
+            <div class="glass-panel" style="padding:20px; display:flex; align-items:center; gap:16px;">
+              <div style="font-size:32px;">✅</div>
+              <div>
+                <div style="font-size:12px; color:var(--text-muted); font-family:var(--font-display);">Completed Topics</div>
+                <h3 style="font-size:20px; color:var(--success);" id="dash-topics-val">28</h3>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Double columns -->
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; margin-bottom:30px; align-items:start;">
+            
+            <!-- Left: Streak Flame Calendar & Hours chart -->
+            <div style="display:flex; flex-direction:column; gap:30px;">
+              <div class="glass-panel" style="padding:24px;">
+                <h4 style="font-size:16px; margin-bottom:12px; font-family:var(--font-display);">Streak Tracker</h4>
+                <div class="streak-days-grid" id="streak-calendar-days">
+                  <!-- JS builds calendar flame nodes -->
+                </div>
+              </div>
+              <div class="glass-panel" style="padding:24px;">
+                <h4 style="font-size:16px; margin-bottom:16px; font-family:var(--font-display);">Daily Study Time</h4>
+                <div id="hours-chart-container" style="width:100%; height:180px;">
+                  <!-- Custom SVG Chart draws here -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Right: Subject Progress Wheels -->
+            <div class="glass-panel" style="padding:24px;">
+              <h4 style="font-size:16px; margin-bottom:16px; font-family:var(--font-display);">Subject Mastery Progress</h4>
+              <div style="display:flex; flex-direction:column; gap:14px;" id="subjects-progress-grid">
+                <!-- Mastery progress bars -->
+              </div>
+            </div>
+          </div>
+          
+          <!-- Bottom Row: Activity Feed -->
+          <div class="glass-panel" style="padding:24px;">
+            <h4 style="font-size:16px; margin-bottom:16px; font-family:var(--font-display);">Recent Milestones</h4>
+            <div id="dash-activity-list">
+              <!-- Activities log -->
+            </div>
+          </div>
+          
+        </section>
+        
+        <!-- AI TUTOR TAB -->
+        <section class="page-tab" id="tab-tutor">
+          <div class="tutor-layout">
+            
+            <!-- Chat section -->
+            <div class="chat-panel glass-panel">
+              <!-- Subject Pills -->
+              <div class="subject-pills-container" id="subject-pills-bar">
+                <span class="subject-pill active" data-subject="Mathematics">Mathematics</span>
+                <span class="subject-pill" data-subject="Physics">Physics</span>
+                <span class="subject-pill" data-subject="Chemistry">Chemistry</span>
+                <span class="subject-pill" data-subject="Biology">Biology</span>
+                <span class="subject-pill" data-subject="Computer Science">Computer Science</span>
+                <span class="subject-pill" data-subject="English">English</span>
+                <span class="subject-pill" data-subject="General Knowledge">General Knowledge</span>
+              </div>
+              
+              <!-- Chat Header bot info -->
+              <div style="padding:14px 20px; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
+                <div class="bot-character-card" id="bot-character-info">
+                  <!-- Loaded dynamically -->
+                </div>
+                <div style="display:flex; gap:10px;">
+                  <button class="tutor-template-btn glow-btn" style="font-size:11px; padding:6px 12px; background:rgba(255,255,255,0.02); border:1px solid var(--border-glass);">Explain like I'm 5</button>
+                  <button class="tutor-template-btn glow-btn" style="font-size:11px; padding:6px 12px; background:rgba(255,255,255,0.02); border:1px solid var(--border-glass);">Give a real-world example</button>
+                </div>
+              </div>
+              
+              <!-- Messages logs -->
+              <div class="chat-messages" id="tutor-chat-messages">
+                <!-- Chat bubbles -->
+              </div>
+              
+              <!-- Input bar -->
+              <div class="chat-input-bar">
+                <input type="text" class="chat-input" id="tutor-chat-input" placeholder="Type your academic doubt here...">
+                <button class="chat-action-btn" id="tutor-send-btn">
+                  <svg viewBox="0 0 24 24" style="width:20px; height:20px; fill:currentColor;"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Ingestions sidebar -->
+            <div class="tutor-sidebar">
+              <div class="upload-card glass-panel" id="tutor-image-uploader">
+                <span class="upload-icon">📸</span>
+                <h4 style="font-size:14px; margin-bottom:4px; font-family:var(--font-display);">OCR Image Doubt Solver</h4>
+                <p style="font-size:11px; color:var(--text-muted);">Upload a screenshot or click to capture photo of your textbooks.</p>
+                <!-- Scanner laser overlay simulation -->
+                <div class="ocr-scanner">
+                  <div class="ocr-line" id="ocr-laser-line"></div>
+                </div>
+              </div>
+              
+              <div class="upload-card glass-panel" id="tutor-pdf-uploader">
+                <span class="upload-icon">📄</span>
+                <h4 style="font-size:14px; margin-bottom:4px; font-family:var(--font-display);">PDF Homework solver</h4>
+                <p style="font-size:11px; color:var(--text-muted);">Drop worksheets/syllabi to automatically extract and solve questions.</p>
+              </div>
+              
+              <!-- Extracted Question List container -->
+              <div class="glass-panel" style="padding:16px; flex-grow:1; display:flex; flex-direction:column; overflow:hidden;">
+                <div id="extracted-questions-list" style="overflow-y:auto; flex-grow:1;">
+                  <div style="text-align:center; padding:30px; font-size:11px; color:var(--text-dark);">
+                    No PDF documents analyzed yet.
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </section>
+        
+        <!-- PRACTICE TESTS TAB -->
+        <section class="page-tab" id="tab-practice">
+          <div class="practice-grid" id="practice-main-grid">
+            <!-- Dynamically Rendered by practice.js -->
+          </div>
+        </section>
+        
+        <!-- NOTES SUMMARIZER TAB -->
+        <section class="page-tab" id="tab-notes">
+          <div class="notes-layout">
+            
+            <!-- Left Pane: Editor, Dropzone, and Notes Lists -->
+            <div class="notes-input-area">
+              <div class="glass-panel" style="padding:20px; display:flex; flex-direction:column; gap:16px; flex-grow:1;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <h4 style="font-size:15px; font-family:var(--font-display);">Paste Material</h4>
+                  <select class="form-select" id="notes-subject-select" style="width:auto; padding:6px 12px; font-size:12px;">
+                    <option value="Mathematics">Mathematics</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Computer Science">Computer Science</option>
+                  </select>
+                </div>
+                
+                <textarea class="notes-textarea" id="notes-raw-input" placeholder="Paste your lecture slides, class notes, transcript transcripts, or textbook chapters here..."></textarea>
+                
+                <div class="dropzone-box" id="notes-file-dropzone">
+                  <span class="dropzone-icon">📥</span>
+                  <div style="font-size:13px; font-weight:600; color:var(--text-main);">Drag & Drop Notes Files</div>
+                  <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Supports PDF or TXT documents</div>
+                </div>
+                
+                <button class="glow-btn" id="summarize-action-btn" style="justify-content:center;">AI Summarize & Make Flashcards</button>
+              </div>
+              
+              <!-- Saved Summaries -->
+              <div class="glass-panel" style="padding:20px; height:180px; display:flex; flex-direction:column; overflow:hidden;">
+                <h4 style="font-size:14px; margin-bottom:12px; font-family:var(--font-display);">Saved Material summaries</h4>
+                <div id="saved-notes-list" style="overflow-y:auto; flex-grow:1;">
+                  <!-- Notes history list -->
+                </div>
+              </div>
+            </div>
+            
+            <!-- Right Pane: Summary Visualizer & Flashcards widget -->
+            <div class="notes-output-area">
+              <div class="glass-panel summary-viewer-card" style="margin-bottom:24px;">
+                <div class="summary-title-bar">
+                  <h3 id="active-summary-title" style="font-size:18px;">Newtonian Mechanics Core Formulas</h3>
+                  <button class="glow-btn" style="font-size:11px; padding:6px 12px; background:rgba(255,255,255,0.02); border:1px solid var(--border-glass);" onclick="alert('PDF Exported!')">Export PDF</button>
+                </div>
+                <div class="summary-markdown" id="active-summary-markdown">
+                  <!-- Summary Markdown content -->
+                </div>
+              </div>
+              
+              <!-- Flashcards Widget Box -->
+              <div class="glass-panel" style="padding:24px;">
+                <h4 class="flashcard-deck-title">Interactive Flashcards</h4>
+                <div id="active-flashcard-box">
+                  <!-- Interactive 3D Card flipper -->
+                </div>
+              </div>
+            </div>
+            
+          </div>
+        </section>
+        
+        <!-- PREVIOUS PAPERS TAB -->
+        <section class="page-tab" id="tab-papers">
+          
+          <div class="papers-filter-bar">
+            <div class="search-wrapper">
+              <span class="search-icon">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+              </span>
+              <input type="text" class="search-input" id="papers-search-input" placeholder="Search exams e.g. IIT-JEE, NEET, SAT...">
+            </div>
+            
+            <select class="form-select filter-select" id="papers-diff-select">
+              <option value="All">All Difficulties</option>
+              <option value="Easy">Easy</option>
+              <option value="Medium">Medium</option>
+              <option value="Hard">Hard</option>
+            </select>
+          </div>
+          
+          <div class="papers-grid" id="papers-cards-grid">
+            <!-- Rendered by papers.js -->
+          </div>
+          
+          <!-- Overlay Board modal simulator -->
+          <div class="whiteboard-modal" id="whiteboard-modal-overlay">
+            <div class="whiteboard-container glass-panel">
+              <div class="whiteboard-header">
+                <h3 style="font-size:16px; font-family:var(--font-display);">AI Whiteboard Explanation Simulator</h3>
+                <button class="whiteboard-close" id="whiteboard-close-btn">
+                  <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+              </div>
+              <div class="whiteboard-screen">
+                <div class="whiteboard-canvas-sim">
+                  <div class="sketch-formula" id="sketch-formula-board">y = A sin(kx - ωt)</div>
+                  <div class="sketch-text" id="sketch-text-board">Define the general sinusoidal wave equation...</div>
+                </div>
+              </div>
+              <div class="whiteboard-controls">
+                <button class="glow-btn" id="whiteboard-step-prev" style="font-size:12px; padding:8px 12px;">Prev Step</button>
+                <div class="video-progress-bar">
+                  <div class="video-progress-fill" id="video-progress-line-fill"></div>
+                </div>
+                <button class="glow-btn" id="whiteboard-play-btn" style="font-size:12px; padding:8px 16px;">Play Solve</button>
+                <button class="glow-btn" id="whiteboard-step-next" style="font-size:12px; padding:8px 12px; margin-left:10px;">Next Step</button>
+              </div>
+            </div>
+          </div>
+          
+        </section>
+        
+        <!-- STUDY PLANNER TAB -->
+        <section class="page-tab" id="tab-planner">
+          <div class="planner-grid">
+            
+            <!-- Left calendar month -->
+            <div class="calendar-card glass-panel">
+              <div class="calendar-header">
+                <h3 class="calendar-month-title" id="calendar-month-year">June 2026</h3>
+                <div class="calendar-nav-buttons">
+                  <button class="glow-btn" id="calendar-prev-month" style="padding:6px 12px; font-size:12px; background:rgba(255,255,255,0.02); border:1px solid var(--border-glass);">◀</button>
+                  <button class="glow-btn" id="calendar-next-month" style="padding:6px 12px; font-size:12px; background:rgba(255,255,255,0.02); border:1px solid var(--border-glass);">▶</button>
+                </div>
+              </div>
+              
+              <div class="calendar-grid-header">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+              </div>
+              
+              <div class="calendar-days-grid" id="calendar-days-grid">
+                <!-- Day cells rendered by planner.js -->
+              </div>
+            </div>
+            
+            <!-- Right daily tasks list -->
+            <div style="display:flex; flex-direction:column; gap:30px;">
+              <div class="checklist-card glass-panel">
+                <div class="checklist-title-bar">
+                  <div>
+                    <h4 style="font-size:15px; font-family:var(--font-display);">Milestones Checklist</h4>
+                    <span style="font-size:11px; color:var(--text-muted);" id="active-planner-date">Wednesday, June 3</span>
+                  </div>
+                  <span style="font-size:10px; color:var(--accent);">+150 XP each</span>
+                </div>
+                
+                <div class="todo-list" id="planner-todo-list">
+                  <!-- Checkbox items -->
+                </div>
+                
+                <!-- Quick add -->
+                <div class="quick-add-form">
+                  <input type="text" class="form-input" id="planner-task-input" placeholder="Add study task..." style="flex-grow:1; font-size:13px; padding:10px 12px;">
+                  <select class="form-select" id="planner-subject-select" style="width:auto; font-size:13px; padding:10px 12px;">
+                    <option value="Mathematics">Math</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chem</option>
+                    <option value="Biology">Bio</option>
+                  </select>
+                  <button class="glow-btn" id="planner-add-task-btn" style="padding:10px 16px;">+</button>
+                </div>
+              </div>
+              
+              <!-- AI study planner wizard card -->
+              <div class="glass-panel" style="padding:24px;">
+                <h4 style="font-size:15px; margin-bottom:12px; font-family:var(--font-display);">AI Course Scheduler</h4>
+                <p style="font-size:11px; color:var(--text-muted); margin-bottom:16px;">Input exam date to generate a personalized timeline checklist.</p>
+                
+                <div class="form-group" style="margin-bottom:12px;">
+                  <label class="form-label" style="font-size:11px;">Target Exam</label>
+                  <select class="form-select" id="ai-exam-select" style="font-size:12px; padding:8px 12px;">
+                    <option value="IIT-JEE Advanced">IIT-JEE Advanced</option>
+                    <option value="NEET Exam">NEET Entrance</option>
+                    <option value="SAT Digital">SAT Digital</option>
+                  </select>
+                </div>
+                
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px;">
+                  <div>
+                    <label class="form-label" style="font-size:11px;">Hours/Day</label>
+                    <select class="form-select" id="ai-hours-select" style="font-size:12px; padding:8px 12px;">
+                      <option value="2">2 Hours</option>
+                      <option value="4">4 Hours</option>
+                      <option value="6">6 Hours</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="form-label" style="font-size:11px;">Exam Date</label>
+                    <input type="date" class="form-input" id="ai-exam-date" value="2026-06-15" style="font-size:12px; padding:8px 12px;">
+                  </div>
+                </div>
+                
+                <button class="glow-btn glow-btn-accent" id="ai-generate-schedule-btn" style="width:100%; justify-content:center; font-size:13px;">Generate AI Schedule</button>
+                <div id="ai-schedule-summary" style="font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center; min-height:16px;"></div>
+              </div>
+            </div>
+            
+          </div>
+        </section>
+        
+      </div>
+      
+    </main>
+    
+  </div>
+
+  <!-- JS Code Files -->
+  <script src="js/db.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/tutor.js"></script>
+  <script src="js/practice.js"></script>
+  <script src="js/notes.js"></script>
+  <script src="js/papers.js"></script>
+  <script src="js/planner.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

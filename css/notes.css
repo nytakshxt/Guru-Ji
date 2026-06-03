@@ -1,0 +1,239 @@
+/* Notes & Flashcard layout */
+.notes-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  height: calc(100vh - var(--header-height) - 100px);
+}
+
+.notes-input-area {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+}
+
+.notes-textarea {
+  flex-grow: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-glass);
+  padding: 20px;
+  border-radius: var(--border-radius-md);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  transition: all var(--transition-fast);
+}
+
+.notes-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-neon-accent);
+}
+
+.dropzone-box {
+  border: 2px dashed var(--border-glass);
+  border-radius: var(--border-radius-md);
+  padding: 30px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.dropzone-box:hover, .dropzone-box.dragover {
+  border-color: var(--accent);
+  background: rgba(0, 240, 255, 0.02);
+}
+
+.dropzone-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  color: var(--accent);
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Summary Output Panel */
+.notes-output-area {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.summary-viewer-card {
+  flex-grow: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.summary-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-glass);
+}
+
+.summary-markdown {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.summary-markdown h3 {
+  font-size: 16px;
+  margin: 18px 0 8px;
+  color: var(--accent);
+}
+
+.summary-markdown ul, .summary-markdown ol {
+  margin-left: 20px;
+  margin-bottom: 14px;
+}
+
+.summary-markdown li {
+  margin-bottom: 6px;
+}
+
+.summary-markdown blockquote {
+  border-left: 3px solid var(--primary);
+  padding-left: 14px;
+  margin: 14px 0;
+  color: var(--text-muted);
+}
+
+/* Flashcards deck styles */
+.flashcards-section {
+  margin-top: 24px;
+}
+
+.flashcard-deck-title {
+  font-size: 16px;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  font-family: var(--font-display);
+}
+
+/* Flashcard Container and CSS 3D Flipping */
+.flashcard-wrapper {
+  perspective: 1000px;
+  width: 100%;
+  height: 240px;
+  margin: 0 auto 24px;
+  cursor: pointer;
+}
+
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform var(--transition-slow);
+  transform-style: preserve-3d;
+}
+
+.flashcard-wrapper.flipped .flashcard-inner {
+  transform: rotateY(180deg);
+}
+
+.flashcard-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-primary);
+  border: 1px solid var(--border-glass);
+}
+
+.flashcard-front {
+  background: linear-gradient(135deg, rgba(22, 20, 42, 0.9), rgba(18, 16, 32, 0.9));
+  color: var(--text-main);
+}
+
+.flashcard-back {
+  background: linear-gradient(135deg, rgba(28, 18, 52, 0.9), rgba(12, 10, 24, 0.9));
+  color: var(--accent);
+  transform: rotateY(180deg);
+  border-color: rgba(0, 240, 255, 0.2);
+}
+
+.flashcard-text {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.card-hint {
+  font-size: 11px;
+  color: var(--text-dark);
+  margin-top: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.flashcard-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+.swipe-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--border-glass);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.swipe-btn.prev:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+}
+
+.swipe-btn.know:hover {
+  background: rgba(5, 227, 138, 0.15);
+  border-color: var(--success);
+  color: var(--success);
+  box-shadow: var(--shadow-neon-accent);
+}
+
+.swipe-btn.next:hover {
+  background: rgba(255, 56, 96, 0.15);
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.deck-progress {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .notes-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .notes-textarea {
+    height: 300px;
+  }
+}
